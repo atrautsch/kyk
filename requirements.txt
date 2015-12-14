@@ -1,0 +1,7 @@
+jsmin==2.1.6
+libsass==0.9.3
+pyaml==15.8.2
+pyinotify==0.9.6
+PyYAML==3.11
+six==1.10.0
+wheel==0.24.0

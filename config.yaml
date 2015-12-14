@@ -1,0 +1,8 @@
+./test/main.min.js:
+- "test/vendor/jquery/jquery-1.11.3.min.js"
+- "test/vendor/bootstrap-4.0.0-alpha.2/dist/js/bootstrap.min.js"
+- "min:test/local/main.js"
+
+# one scss includes everything, therefore we only need one
+./test/main.min.css:
+- "test/local/styles.scss"
