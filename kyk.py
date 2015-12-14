@@ -4,9 +4,10 @@ import argparse
 
 import yaml
 import sass
+import pyinotify
 
 from jsmin import jsmin
-
+from csscompressor import compress
 
 class Kyk(object):
     
@@ -17,7 +18,6 @@ class Kyk(object):
         if not os.path.isfile(cfgfile):
             raise Exception('no config file "{}" found!'.format(cfgfile))
 
-
         with open(cfgfile, 'r') as f:
             dat = f.read()
 
@@ -25,19 +25,47 @@ class Kyk(object):
 
         self._js = {}
         self._css = {}
+        self._jswatchlist = []
+
+    def _add_to_watchlist(self, jslist):
+        for f in jslist:
+            fname = f
+            if f.startswith('min:'):
+                fname = f.split('min:')[1].strip()
+
+            self._jswatchlist.append(os.path.abspath(fname))
 
     def watch_forever(self):
-        import pprint
-        pprint.pprint(self._cfg)
-
+        # first run, build everything
         for minfile in self._cfg.keys():
             if minfile.endswith('.js'):
                 self._js[minfile] = self._cfg[minfile]
+                self._add_to_watchlist(self._cfg[minfile])
             if minfile.endswith('.css'):
                 self._css[minfile] = self._cfg[minfile]
 
         self.build_js()
         self.build_sass()
+
+        # now only changed files
+        wm = pyinotify.WatchManager()
+        notifier = pyinotify.Notifier(wm, default_proc_fun=self.handler)
+        wm.add_watch(self._folder, pyinotify.ALL_EVENTS, rec=True, auto_add=True)
+        notifier.loop()
+
+    def handler(self, event):
+        #if event.maskname == 'IN_MODIFY':
+        #    print(event.pathname)
+
+        if event.pathname.endswith('.scss'):
+            if event.maskname == 'IN_MODIFY':
+                print('{} changed!'.format(event.pathname))
+                self.build_sass()
+
+        if event.pathname in self._jswatchlist:
+            if event.maskname == 'IN_MODIFY':
+                print('{} changed!'.format(event.pathname))
+                
 
 
     def build_js(self):
@@ -59,22 +87,11 @@ class Kyk(object):
             out = jsmin(out)
         return out
 
-    def _load_sass(self, sassfile):
-        with open(sassfile, 'r') as f:
-            out = f.read()
-        return out
-
     def build_sass(self):
         for minfile in self._css.keys():
             with open(minfile, 'w') as f:
-                out = ''
-
                 for sassfile in self._css[minfile]:
-                    out += self._load_sass(sassfile) + "\n"
-                    print(os.path.dirname(sassfile))
-                    os.chdir(os.path.dirname(sassfile))  # <-- problem: 
-
-                f.write(sass.compile(string=out))
+                    f.write(compress(sass.compile(filename=sassfile)))
 
 
 
