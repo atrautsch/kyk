@@ -65,10 +65,11 @@ class Kyk(object):
         if event.pathname in self._jswatchlist:
             if event.maskname == 'IN_MODIFY':
                 print('{} changed!'.format(event.pathname))
-                
+
 
 
     def build_js(self):
+        print('building js...')
         for minfile in self._js.keys():
             with open(minfile, 'w') as f:
                 for jsfile in self._js[minfile]:
@@ -78,6 +79,7 @@ class Kyk(object):
                         out = self._load_js(jsfile)
 
                     f.write(out)
+        print('finished')
 
     def _load_js(self, jsfile, minfy=False):
         with open(jsfile, 'r') as f:
@@ -88,11 +90,12 @@ class Kyk(object):
         return out
 
     def build_sass(self):
+        print('building sass...')
         for minfile in self._css.keys():
             with open(minfile, 'w') as f:
                 for sassfile in self._css[minfile]:
                     f.write(compress(sass.compile(filename=sassfile)))
-
+        print('finished')
 
 
 def main():
