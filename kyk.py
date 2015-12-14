@@ -65,23 +65,40 @@ class Kyk(object):
         if event.pathname in self._jswatchlist:
             if event.maskname == 'IN_MODIFY':
                 print('{} changed!'.format(event.pathname))
-
+                self.build_js()
 
 
     def build_js(self):
+        """
+        Todo:
+        - min soll die file speichern, nur die wird neu gebaut wenn die sich aendert, concateniert wird immer
+        """
         print('building js...')
         for minfile in self._js.keys():
             with open(minfile, 'w') as f:
                 for jsfile in self._js[minfile]:
                     if jsfile.startswith('min:'):
-                        out = self._load_js(jsfile.split('min:')[1], minfy=True)
-                    else:
-                        out = self._load_js(jsfile)
+                        self._write_js(jsfile.split('min:')[1].strip(), minfy=True)
+
+                    out = self._load_js(jsfile)
 
                     f.write(out)
         print('finished')
 
+    def build_partial_js(self, changed):
+        print('building partial js...')
+        
+        print('finished')
+
+    def _write_js(self, jsfile, minify=True):
+        out = self._load_js(jsfile, minify)
+
+        with open('{}_minified'.format(jsfile), 'w') as f:
+            f.write(out)
+
     def _load_js(self, jsfile, minfy=False):
+        if os.path.isfile('{}_minified'.format(jsfile)):
+            jsfile = '{}_minified'.format(jsfile)
         with open(jsfile, 'r') as f:
             out = f.read()
 
