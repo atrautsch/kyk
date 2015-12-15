@@ -1,3 +1,4 @@
+#!/srv/www/kyk/bin/python
 
 import os
 import argparse
@@ -6,7 +7,7 @@ import yaml
 import sass
 import pyinotify
 
-from colorama import init, Fore
+from colorama import init, Fore, Style
 from jsmin import jsmin
 from csscompressor import compress
 
@@ -42,6 +43,7 @@ class Kyk(object):
         self._js = {}
         self._css = {}
         self._jswatchlist = []
+        self._listen_events = []
 
         init()
         self._load_config()
@@ -50,16 +52,23 @@ class Kyk(object):
     def _load_config(self):
         for minfile in self._cfg.keys():
             if minfile == 'version':
-                self._version = minfile:
+                self._version = minfile
+            elif minfile == 'events':
+                self._listen_events.append(self._cfg[minfile])
+
             elif minfile.endswith('.js'):
                 jsfile = self._cfg[minfile]
                 minify = False
-                if jsfile.startswith('min:'):
-                    minify = True
-                    jsfile = jsfile.split('min:')[1].strip()
+                
+                for jsfile in self._cfg[minfile]:
+                    if jsfile.startswith('min:'):
+                        minify = True
+                        jsfile = jsfile.split('min:')[1].strip()
+                    if minfile not in self._js.keys():
+                        self._js[minfile] = []
 
-                self._js[minfile] = {'file': os.path.abspath(jsfile), 'minify': minify}
-                self._jswatchlist.append(os.path.abspath(jsfile))
+                    self._js[minfile].append({'file': os.path.abspath(jsfile), 'minify': minify})
+                    self._jswatchlist.append(os.path.abspath(jsfile))
             elif minfile.endswith('.css'):
                 self._css[minfile] = self._cfg[minfile]
 
@@ -80,13 +89,13 @@ class Kyk(object):
 
         # catch every scss file change, we can do this here because we are limited by the watchpath
         if event.pathname.endswith('.scss'):
-            if event.maskname == 'IN_MODIFY':
+            if event.maskname in self._listen_events:
                 print('{} changed!'.format(event.pathname))
                 self.build_sass()
 
         # catch only changes to our jsfiles
         elif event.pathname in self._jswatchlist:
-            if event.maskname == 'IN_MODIFY':
+            if event.maskname in self._listen_events:
                 print('{} changed!'.format(event.pathname))
                 self.build_js()
 
@@ -140,6 +149,7 @@ class Kyk(object):
 
         if not os.path.isfile(jsfile):
             print(Fore.RED + 'File {} not found!'.format(jsfile))
+            print(Style.RESET_ALL)
 
         with open(jsfile, 'r') as f:
             out = f.read()
@@ -147,13 +157,16 @@ class Kyk(object):
         return out
 
     def build_sass(self):
-        print('building sass...')
-        for minfile in self._css.keys():
-            with open(minfile, 'w') as f:
-                for sassfile in self._css[minfile]:
-                    f.write(compress(sass.compile(filename=sassfile)))
-        print('finished')
-
+        try:
+            print('building sass...')
+            for minfile in self._css.keys():
+                with open(minfile, 'w') as f:
+                    for sassfile in self._css[minfile]:
+                        f.write(compress(sass.compile(filename=sassfile)))
+            print('finished')
+        except sass.CompileError as e:
+            print(Fore.RED + 'SASS Error: {}'.format(e))
+            print(Style.RESET_ALL)
 
 def main():
     a = argparse.ArgumentParser()

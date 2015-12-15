@@ -1,4 +1,7 @@
+# mögliche events: IN_MODIFY, IN_ATTIRIB
 version: 1
+events:
+- IN_MODIFY
 
 ./test/main.min.js:
 - "test/vendor/jquery/jquery-1.11.3.min.js"
