@@ -43,18 +43,16 @@ class Kyk(object):
             if minfile == 'version':
                 self._version = minfile:
             elif minfile.endswith('.js'):
-                self._js[minfile] = self._cfg[minfile]
-                self._add_to_watchlist(self._cfg[minfile])
+                jsfile = self._cfg[minfile]
+                minify = False
+                if jsfile.startswith('min:'):
+                    minify = True
+                    jsfile = jsfile.split('min:')[1].strip()
+
+                self._js[minfile] = {'file': os.path.abspath(jsfile), 'minify': minify}
+                self._jswatchlist.append(os.path.abspath(jsfile))
             elif minfile.endswith('.css'):
                 self._css[minfile] = self._cfg[minfile]
-
-    def _add_to_watchlist(self, jslist):
-        for f in jslist:
-            fname = f
-            if f.startswith('min:'):
-                fname = f.split('min:')[1].strip()
-
-            self._jswatchlist.append(os.path.abspath(fname))
 
     def watch_forever(self):
         # first run, build everything
@@ -89,10 +87,10 @@ class Kyk(object):
         for minfile in self._js.keys():
             with open(minfile, 'w') as f:
                 for jsfile in self._js[minfile]:
-                    if jsfile.startswith('min:'):
-                        self.minify_js(jsfile.split('min:')[1].strip())
+                    if jsfile['minify']:
+                        self.minify_js(jsfile['file'])
 
-                    out = self._load_js(jsfile)
+                    out = self._load_js(jsfile['file'])
 
                     f.write(out)
         print('finished')
@@ -101,7 +99,7 @@ class Kyk(object):
         print('building {}...'.format(destfile))
         with open(destfile, 'w') as f:
             for jsfile in self._js[destfile]:
-                f.write(self._load_js(jsfile))
+                f.write(self._load_js(jsfile['file']))
         print('finished')
 
     def minify_js(self, jsfile=None):
@@ -118,15 +116,9 @@ class Kyk(object):
         
         for minfile in self._js:
             for jsfile in self._js[minfile]:
-                minify = False
-                if jsfile.startswith('min:'):
-                    tmp = jsfile.split('min:').strip()
-                    minify = True
-                tmp = os.path.abspath(tmp)
-
-                if changed == tmp:
-                    if minify:
-                        self.minify_js(jsfile.split('min:').strip())
+                if changed == jsfile['file']:
+                    if jsfile['minify']:
+                        self.minify_js(jsfile['file'])
                     self.concat_js(minfile)
         print('finished')
 
