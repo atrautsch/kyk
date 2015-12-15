@@ -23,6 +23,8 @@ class Kyk(object):
 
     todo:
     - hooks after change event?, min as hook?
+    - error handling
+    - linting?
     """
     
     def __init__(self, folder):
@@ -138,7 +140,7 @@ class Kyk(object):
 
         if not os.path.isfile(jsfile):
             print(Fore.RED + 'File {} not found!'.format(jsfile))
-            
+
         with open(jsfile, 'r') as f:
             out = f.read()
 
