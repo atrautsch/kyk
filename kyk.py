@@ -35,7 +35,7 @@ class Kyk(object):
         if not os.path.isfile(cfgfile):
             raise Exception('no config file "{}" found!'.format(cfgfile))
 
-        with open(cfgfile, 'r') as f:
+        with open(cfgfile, 'r', encoding='utf-8') as f:
             dat = f.read()
 
         self._cfg = yaml.load(dat)
@@ -108,7 +108,7 @@ class Kyk(object):
         """
         print('building js...')
         for minfile in self._js.keys():
-            with open(minfile, 'w') as f:
+            with open(minfile, 'w', encoding='utf-8') as f:
                 for jsfile in self._js[minfile]:
                     if jsfile['minify']:
                         self.minify_js(jsfile['file'])
@@ -120,7 +120,7 @@ class Kyk(object):
 
     def concat_js(self, destfile):
         print('building {}...'.format(destfile))
-        with open(destfile, 'w') as f:
+        with open(destfile, 'w', encoding='utf-8') as f:
             for jsfile in self._js[destfile]:
                 f.write(self._load_js(jsfile['file']))
         print('finished')
@@ -130,7 +130,7 @@ class Kyk(object):
         """
         out = jsmin(self._load_js(jsfile, load_minified=False))
 
-        with open('{}_minified'.format(jsfile), 'w') as f:
+        with open('{}_minified'.format(jsfile), 'w', encoding='utf-8') as f:
             f.write(out)
 
     def build_partial_js(self, changed):
@@ -154,7 +154,7 @@ class Kyk(object):
             print(Fore.RED + 'File {} not found!'.format(jsfile))
             print(Style.RESET_ALL)
 
-        with open(jsfile, 'r') as f:
+        with open(jsfile, 'r', encoding='utf-8') as f:
             out = f.read()
 
         return out
@@ -163,7 +163,7 @@ class Kyk(object):
         try:
             print('building sass...')
             for minfile in self._css.keys():
-                with open(minfile, 'w') as f:
+                with open(minfile, 'w', encoding='utf-8') as f:
                     for sassfile in self._css[minfile]:
                         f.write(compress(sass.compile(filename=sassfile)))
             print('finished')

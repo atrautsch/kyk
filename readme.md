@@ -7,6 +7,11 @@ Kyk
 - minify and concatenate js
 
 
+wichtig
+-------
+Auf ServerB ist es installiert aber dort wird es nicht automatisch geupdated (da der pfad zum virtualenv ein anderer ist).
+
+
 uses
 ----
 https://github.com/tikitu/jsmin
