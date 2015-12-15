@@ -10,6 +10,15 @@ from jsmin import jsmin
 from csscompressor import compress
 
 class Kyk(object):
+    """
+    Build JS
+    - if min: minify in place, append _minifed
+    - concat to destfile
+
+    Build SASS:
+    - compile SASS file
+    - concat to destfile
+    """
     
     def __init__(self, folder):
         self._folder = folder
@@ -27,6 +36,18 @@ class Kyk(object):
         self._css = {}
         self._jswatchlist = []
 
+        self._load_config()
+
+    def _load_config(self):
+        for minfile in self._cfg.keys():
+            if minfile == 'version':
+                self._version = minfile:
+            elif minfile.endswith('.js'):
+                self._js[minfile] = self._cfg[minfile]
+                self._add_to_watchlist(self._cfg[minfile])
+            elif minfile.endswith('.css'):
+                self._css[minfile] = self._cfg[minfile]
+
     def _add_to_watchlist(self, jslist):
         for f in jslist:
             fname = f
@@ -37,13 +58,6 @@ class Kyk(object):
 
     def watch_forever(self):
         # first run, build everything
-        for minfile in self._cfg.keys():
-            if minfile.endswith('.js'):
-                self._js[minfile] = self._cfg[minfile]
-                self._add_to_watchlist(self._cfg[minfile])
-            if minfile.endswith('.css'):
-                self._css[minfile] = self._cfg[minfile]
-
         self.build_js()
         self.build_sass()
 
@@ -69,41 +83,62 @@ class Kyk(object):
 
 
     def build_js(self):
-        """
-        Todo:
-        - min soll die file speichern, nur die wird neu gebaut wenn die sich aendert, concateniert wird immer
+        """minify everything, then concat everything
         """
         print('building js...')
         for minfile in self._js.keys():
             with open(minfile, 'w') as f:
                 for jsfile in self._js[minfile]:
                     if jsfile.startswith('min:'):
-                        self._write_js(jsfile.split('min:')[1].strip(), minfy=True)
+                        self.minify_js(jsfile.split('min:')[1].strip())
 
                     out = self._load_js(jsfile)
 
                     f.write(out)
         print('finished')
 
+    def concat_js(self, destfile):
+        print('building {}...'.format(destfile))
+        with open(destfile, 'w') as f:
+            for jsfile in self._js[destfile]:
+                f.write(self._load_js(jsfile))
+        print('finished')
+
+    def minify_js(self, jsfile=None):
+        """Minify JS in place, append _minified
+        """
+        if jsfile:
+            out = jsmin(self._load_js(jsfile))
+
+            with open('{}_minified'.format(jsfile), 'w') as f:
+                f.write(out)
+
     def build_partial_js(self, changed):
         print('building partial js...')
         
+        for minfile in self._js:
+            for jsfile in self._js[minfile]:
+                minify = False
+                if jsfile.startswith('min:'):
+                    tmp = jsfile.split('min:').strip()
+                    minify = True
+                tmp = os.path.abspath(tmp)
+
+                if changed == tmp:
+                    if minify:
+                        self.minify_js(jsfile.split('min:').strip())
+                    self.concat_js(minfile)
         print('finished')
 
-    def _write_js(self, jsfile, minify=True):
-        out = self._load_js(jsfile, minify)
-
-        with open('{}_minified'.format(jsfile), 'w') as f:
-            f.write(out)
-
-    def _load_js(self, jsfile, minfy=False):
+    def _load_js(self, jsfile):
+        """Load js from file, load _minifed if exists
+        """
         if os.path.isfile('{}_minified'.format(jsfile)):
             jsfile = '{}_minified'.format(jsfile)
+
         with open(jsfile, 'r') as f:
             out = f.read()
 
-        if minfy:
-            out = jsmin(out)
         return out
 
     def build_sass(self):
