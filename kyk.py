@@ -6,8 +6,10 @@ import yaml
 import sass
 import pyinotify
 
+from colorama import init, Fore
 from jsmin import jsmin
 from csscompressor import compress
+
 
 class Kyk(object):
     """
@@ -18,6 +20,9 @@ class Kyk(object):
     Build SASS:
     - compile SASS file
     - concat to destfile
+
+    todo:
+    - hooks after change event?, min as hook?
     """
     
     def __init__(self, folder):
@@ -36,7 +41,9 @@ class Kyk(object):
         self._css = {}
         self._jswatchlist = []
 
+        init()
         self._load_config()
+
 
     def _load_config(self):
         for minfile in self._cfg.keys():
@@ -69,7 +76,7 @@ class Kyk(object):
         #if event.maskname == 'IN_MODIFY':
         #    print(event.pathname)
 
-        # catch every scss file change
+        # catch every scss file change, we can do this here because we are limited by the watchpath
         if event.pathname.endswith('.scss'):
             if event.maskname == 'IN_MODIFY':
                 print('{} changed!'.format(event.pathname))
@@ -107,11 +114,10 @@ class Kyk(object):
     def minify_js(self, jsfile=None):
         """Minify JS in place, append _minified
         """
-        if jsfile:
-            out = jsmin(self._load_js(jsfile))
+        out = jsmin(self._load_js(jsfile, load_minified=False))
 
-            with open('{}_minified'.format(jsfile), 'w') as f:
-                f.write(out)
+        with open('{}_minified'.format(jsfile), 'w') as f:
+            f.write(out)
 
     def build_partial_js(self, changed):
         print('building partial js...')
@@ -124,12 +130,15 @@ class Kyk(object):
                     self.concat_js(minfile)
         print('finished')
 
-    def _load_js(self, jsfile):
-        """Load js from file, load _minifed if exists
+    def _load_js(self, jsfile, load_minified=True):
+        """Load js from file, load _minifed if exists and we want to have it (we do not want it if we minify anew)
         """
-        if os.path.isfile('{}_minified'.format(jsfile)):
+        if load_minified and os.path.isfile('{}_minified'.format(jsfile)):
             jsfile = '{}_minified'.format(jsfile)
 
+        if not os.path.isfile(jsfile):
+            print(Fore.RED + 'File {} not found!'.format(jsfile))
+            
         with open(jsfile, 'r') as f:
             out = f.read()
 
