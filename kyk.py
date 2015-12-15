@@ -69,12 +69,14 @@ class Kyk(object):
         #if event.maskname == 'IN_MODIFY':
         #    print(event.pathname)
 
+        # catch every scss file change
         if event.pathname.endswith('.scss'):
             if event.maskname == 'IN_MODIFY':
                 print('{} changed!'.format(event.pathname))
                 self.build_sass()
 
-        if event.pathname in self._jswatchlist:
+        # catch only changes to our jsfiles
+        elif event.pathname in self._jswatchlist:
             if event.maskname == 'IN_MODIFY':
                 print('{} changed!'.format(event.pathname))
                 self.build_js()
