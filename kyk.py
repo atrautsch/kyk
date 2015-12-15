@@ -54,7 +54,7 @@ class Kyk(object):
             if minfile == 'version':
                 self._version = minfile
             elif minfile == 'events':
-                self._listen_events.append(self._cfg[minfile])
+                self._listen_events = self._cfg[minfile]
 
             elif minfile.endswith('.js'):
                 jsfile = self._cfg[minfile]
@@ -71,6 +71,9 @@ class Kyk(object):
                     self._jswatchlist.append(os.path.abspath(jsfile))
             elif minfile.endswith('.css'):
                 self._css[minfile] = self._cfg[minfile]
+
+        print('listening on:')
+        print(self._listen_events)
 
     def watch_forever(self):
         # first run, build everything
