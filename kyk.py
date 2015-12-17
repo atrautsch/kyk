@@ -31,7 +31,7 @@ class Kyk(object):
     def __init__(self, folder):
         self._folder = folder
 
-        cfgfile = os.path.normpath(os.path.join(self._folder, 'config.yaml'))
+        cfgfile = os.path.normpath(os.path.join(self._folder, 'kyk.yaml'))
         if not os.path.isfile(cfgfile):
             raise Exception('no config file "{}" found!'.format(cfgfile))
 
@@ -122,7 +122,7 @@ class Kyk(object):
         print('building {}...'.format(destfile))
         with open(destfile, 'w', encoding='utf-8') as f:
             for jsfile in self._js[destfile]:
-                f.write(self._load_js(jsfile['file']))
+                f.write(self._load_js(jsfile['file'])+';')
         print('finished')
 
     def minify_js(self, jsfile=None):
@@ -165,7 +165,10 @@ class Kyk(object):
             for minfile in self._css.keys():
                 with open(minfile, 'w', encoding='utf-8') as f:
                     for sassfile in self._css[minfile]:
-                        f.write(compress(sass.compile(filename=sassfile)))
+                        if sassfile.endswith('.scss'):
+                            f.write(compress(sass.compile(filename=sassfile)))
+                        else:
+                            f.write(compress(open(sassfile, 'r', encoding='utf-8').read()))
             print('finished')
         except sass.CompileError as e:
             print(Fore.RED + 'SASS Error: {}'.format(e))
