@@ -9,6 +9,6 @@ setup(name='Kyk',
       author='Alexander Trautsch',
       author_email='at@fma-medien.de',
       url='https://gitlab.drecks-provider.de/werkzeuge/kyk',
-      py_modules=['kyk.py'],
-      scripts=['kyk.py']
+      py_modules=['kyk'],
+      scripts=['kyk/kyk']
      )
