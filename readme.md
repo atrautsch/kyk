@@ -1,41 +1,24 @@
 Kyk
 ===
-- kyk.yaml
-- watch for changes with inotfiy
-- compile sass file
-- minify and concatenate js
+Simple watchscript for building minified js and css files.
 
+Watches for changes in the current directory and child directories.
+It uses pyinotify for detecting changes and libsass for compiling sass files.
 
-wichtig
--------
-Auf ServerB ist es installiert aber dort wird es nicht automatisch geupdated (da der pfad zum virtualenv ein anderer ist).
+A example config file can be printed with kyk --yaml.
 
+quickstart
+----------
+```bash
+# go into the directory where you want to detect changes
+cd templates
 
-uses
-----
-https://github.com/tikitu/jsmin
-https://github.com/seb-m/pyinotify
-https://github.com/dahlia/libsass-python
+# write example config
+kyk --yaml > kyk.yaml
 
+# change config
+vi kyk.yaml
 
-Beispiel Konfig
-----------------
-
-Die wird z.B. in processwire/site/templates/config.yaml abgelegt.
+# run kyk
+kyk
 ```
-# mögliche events: alle inotify events, z.B. IN_MODIFY, IN_ATTRIB
-version: 1
-events:
-- IN_MODIFY
-
-./test/main.min.js:
-- "test/vendor/jquery/jquery-1.11.3.min.js"
-- "test/vendor/bootstrap-4.0.0-alpha.2/dist/js/bootstrap.min.js"
-- "min:test/local/main.js"
-
-# one scss includes everything, therefore we only need one
-./test/main.min.css:
-- "test/styles.scss"
-```
-
-Dann einfach im Ordner wo die config.yaml liegt kyk aufrufen.

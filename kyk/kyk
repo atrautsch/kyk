@@ -1,15 +1,42 @@
 #!/usr/bin/env python
 
-import os
 import argparse
 from kyk import Kyk
 
+EXAMPLE ="""
+# kyk config file
+#----------------------
+# cfg version
+version: 1
+
+# possible events on which css or js is build, takes everything pyinotify takes
+events:
+- IN_MODIFY
+- IN_MOVE
+- IN_MOVED_TO
+
+# js files, if min: is prepended minify first (saved to filename_minified) and then concat to main file (main.min.js)
+./test/main.min.js:
+- "test/vendor/jquery/jquery-1.11.3.min.js"
+- "test/vendor/bootstrap-4.0.0-alpha.2/dist/js/bootstrap.min.js"
+- "min:test/local/main.js"
+
+# if a css file is detected it is minified everytime, if a scss file is detected it is compiled first
+./test/main.min.css:
+- "test/styles.scss"
+- "test/style.dev.css"
+"""
+
 def main():
-    a = argparse.ArgumentParser()
-    a.add_argument('--folder', help='folder to watch', default='.')
+    a = argparse.ArgumentParser(description="kyk watchscript, detect changes in sass and configured js files with pyinotify")
+    a.add_argument('--yaml', action='store_true', help='print example yaml config for kyk')
     args = vars(a.parse_args())
 
-    k = Kyk(args['folder'])
+    if args['yaml']:
+        print(EXAMPLE)
+        sys.exit(0)
+
+    k = Kyk('.')
     k.watch_forever()
 
 if __name__ == '__main__':

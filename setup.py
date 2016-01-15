@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(name='Kyk',
       version='1.0',
-      description='SASS, css, js minifier watchscript',
+      description='sass, css, js minifier watchscript',
       install_requires = ['csscompressor', 'colorama', 'jsmin', 'libsass', 'pyinotify', 'pyaml'],
       author='Alexander Trautsch',
       author_email='at@fma-medien.de',

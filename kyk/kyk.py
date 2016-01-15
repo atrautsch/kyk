@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import argparse
 
 import yaml
 import sass
@@ -21,11 +20,6 @@ class Kyk(object):
     Build SASS:
     - compile SASS file
     - concat to destfile
-
-    todo:
-    - hooks after change event?, min as hook?
-    - error handling
-    - linting?
     """
     
     def __init__(self, folder):
@@ -87,21 +81,17 @@ class Kyk(object):
         notifier.loop()
 
     def handler(self, event):
-        #if event.maskname == 'IN_MODIFY':
-        #    print(event.pathname)
-
         # catch every scss file change, we can do this here because we are limited by the watchpath
         if event.pathname.endswith('.scss'):
             if event.maskname in self._listen_events:
                 print('{} changed!'.format(event.pathname))
                 self.build_sass()
 
-        # catch only changes to our jsfiles
+        # catch only changes to our configured jsfiles
         elif event.pathname in self._jswatchlist:
             if event.maskname in self._listen_events:
                 print('{} changed!'.format(event.pathname))
                 self.build_js()
-
 
     def build_js(self):
         """minify everything, then concat everything
@@ -173,14 +163,3 @@ class Kyk(object):
         except sass.CompileError as e:
             print(Fore.RED + 'SASS Error: {}'.format(e))
             print(Style.RESET_ALL)
-
-def main():
-    a = argparse.ArgumentParser()
-    a.add_argument('--folder', help='folder to watch', default='.')
-    args = vars(a.parse_args())
-
-    k = Kyk(args['folder'])
-    k.watch_forever()
-
-if __name__ == '__main__':
-    main()
