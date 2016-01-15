@@ -1,7 +1,6 @@
 Kyk
 ===
-
-- config.yaml
+- kyk.yaml
 - watch for changes with inotfiy
 - compile sass file
 - minify and concatenate js
@@ -24,7 +23,7 @@ Beispiel Konfig
 
 Die wird z.B. in processwire/site/templates/config.yaml abgelegt.
 ```
-# mögliche events: IN_MODIFY, IN_ATTIRIB
+# mögliche events: alle inotify events, z.B. IN_MODIFY, IN_ATTRIB
 version: 1
 events:
 - IN_MODIFY
