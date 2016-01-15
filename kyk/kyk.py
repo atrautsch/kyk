@@ -22,8 +22,9 @@ class Kyk(object):
     - concat to destfile
     """
     
-    def __init__(self, folder):
+    def __init__(self, folder, debug):
         self._folder = folder
+        self._debug = debug
 
         cfgfile = os.path.normpath(os.path.join(self._folder, 'kyk.yaml'))
         if not os.path.isfile(cfgfile):
@@ -100,7 +101,7 @@ class Kyk(object):
         for minfile in self._js.keys():
             with open(minfile, 'w', encoding='utf-8') as f:
                 for jsfile in self._js[minfile]:
-                    if jsfile['minify']:
+                    if jsfile['minify'] and not self._debug:
                         self.minify_js(jsfile['file'])
 
                     out = self._load_js(jsfile['file'])
@@ -112,6 +113,8 @@ class Kyk(object):
         print('building {}...'.format(destfile))
         with open(destfile, 'w', encoding='utf-8') as f:
             for jsfile in self._js[destfile]:
+                if self._debug:
+                    f.write('{}\n'.format(self._load_js(jsfile['file']))
                 f.write(self._load_js(jsfile['file'])+';')
         print('finished')
 
@@ -129,7 +132,7 @@ class Kyk(object):
         for minfile in self._js:
             for jsfile in self._js[minfile]:
                 if changed == jsfile['file']:
-                    if jsfile['minify']:
+                    if jsfile['minify'] and not self._debug:
                         self.minify_js(jsfile['file'])
                     self.concat_js(minfile)
         print('finished')

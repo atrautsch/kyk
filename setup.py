@@ -2,13 +2,14 @@
 
 from setuptools import setup
 
-setup(name='Kyk',
+setup(name='kyk',
       version='0.1',
       description='sass, css, js minifier watchscript',
       install_requires = ['csscompressor', 'colorama', 'jsmin', 'libsass', 'pyinotify', 'pyaml'],
-      author='Alexander Trautsch',
+      author='a-t-x',
       author_email='atx@drecks-provider.de',
       url='https://gitlab.drecks-provider.de/werkzeuge/kyk',
+      download_url='https://gitlab.drecks-provider.de/werkzeuge/kyk/repository/archive.tar.gz?ref=release',
       py_modules=['kyk'],
       scripts=['kyk/kyk'],
       classifiers = [

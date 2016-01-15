@@ -1,6 +1,7 @@
 Kyk
 ===
 Simple watchscript for building minified js and css files.
+Linux only as it uses pyinotify.
 
 Watches for changes in the current directory and child directories.
 It uses pyinotify for detecting changes and libsass for compiling sass files.

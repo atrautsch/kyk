@@ -32,13 +32,14 @@ events:
 def main():
     a = argparse.ArgumentParser(description="kyk watchscript, detect changes in sass and configured js files with pyinotify")
     a.add_argument('--yaml', action='store_true', help='print example yaml config for kyk')
+    a.add_argument('--debug', action='store_true', help='no minification, only concatenation of files')
     args = vars(a.parse_args())
 
     if args['yaml']:
         print(EXAMPLE)
         sys.exit(0)
 
-    k = Kyk('.')
+    k = Kyk('.', args['debug'])
     k.watch_forever()
 
 if __name__ == '__main__':
