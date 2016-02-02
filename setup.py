@@ -11,6 +11,7 @@ setup(name='kyk',
       url='https://gitlab.drecks-provider.de/werkzeuge/kyk',
       download_url='https://gitlab.drecks-provider.de/werkzeuge/kyk/repository/archive.tar.gz?ref=release',
       py_modules=['kyk'],
+      packages=['kyk'],
       scripts=['kyk/kyk'],
       classifiers = [
         "Programming Language :: Python",
