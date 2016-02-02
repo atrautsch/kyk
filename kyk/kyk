@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from kyk import Kyk
+from kyk.kyk import Kyk
 
 EXAMPLE ="""
 # kyk config file
