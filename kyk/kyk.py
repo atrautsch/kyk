@@ -114,7 +114,7 @@ class Kyk(object):
         with open(destfile, 'w', encoding='utf-8') as f:
             for jsfile in self._js[destfile]:
                 if self._debug:
-                    f.write('{}\n'.format(self._load_js(jsfile['file']))
+                    f.write('{}\n'.format(self._load_js(jsfile['file'])))
                 f.write(self._load_js(jsfile['file'])+';')
         print('finished')
 
