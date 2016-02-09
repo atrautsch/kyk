@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
-#from setuptools import setup
+import sys
+
 from setuptools import setup, find_packages
+
+if not sys.version_info[0] == 3:
+    print('only python3 supported!')
+    sys.exit(1)
 
 setup(name='kyk',
       version='1.0',
