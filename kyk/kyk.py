@@ -166,7 +166,7 @@ class Kyk(object):
         try: 
             if self._timestamp_file:
                 with open(self._timestamp_file, 'w') as f:
-                    f.write(int(time.time()))
+                    f.write('{}'.format(int(time.time())))
                 print('timesamp updated')
         except Exception as e:
             print(Fore.RED + 'Error updating timestamp file: {}'.format(e))
