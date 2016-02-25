@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import time
 
 import yaml
 import sass
@@ -10,9 +11,11 @@ from colorama import init, Fore, Style
 from jsmin import jsmin
 from csscompressor import compress
 
+VERSION = 1.0
 
 class Kyk(object):
-    """
+    """Kyk
+
     Build JS
     - if min: minify in place, append _minifed
     - concat to destfile
@@ -20,6 +23,8 @@ class Kyk(object):
     Build SASS:
     - compile SASS file
     - concat to destfile
+
+    Build partial js not yet implemented completely
     """
     
     def __init__(self, folder, debug):
@@ -45,13 +50,12 @@ class Kyk(object):
 
 
     def _load_config(self):
-        for minfile in self._cfg.keys():
-            if minfile == 'version':
-                self._version = minfile
-            elif minfile == 'events':
-                self._listen_events = self._cfg[minfile]
+        self._version = self._cfg['version']
+        self._listen_events = self._cfg['events']
+        self._timestamp_file = self._cfg['timestamp_file']
 
-            elif minfile.endswith('.js'):
+        for minfile in self._cfg.keys():
+            if minfile.endswith('.js'):
                 jsfile = self._cfg[minfile]
                 minify = False
                 
@@ -69,6 +73,8 @@ class Kyk(object):
 
         print('listening on:')
         print(self._listen_events)
+        print('config version: {}'.format(self._version))
+        print('Kyk version: {}'.format(VERSION))
 
     def watch_forever(self):
         # first run, build everything
@@ -83,16 +89,17 @@ class Kyk(object):
 
     def handler(self, event):
         # catch every scss file change, we can do this here because we are limited by the watchpath
-        if event.pathname.endswith('.scss'):
-            if event.maskname in self._listen_events:
-                print('{} changed!'.format(event.pathname))
-                self.build_sass()
+        if getattr(event, 'pathname'):
+            if event.pathname.endswith('.scss'):
+                if event.maskname in self._listen_events:
+                    print('{} changed!'.format(event.pathname))
+                    self.build_sass()
 
-        # catch only changes to our configured jsfiles
-        elif event.pathname in self._jswatchlist:
-            if event.maskname in self._listen_events:
-                print('{} changed!'.format(event.pathname))
-                self.build_js()
+            # catch only changes to our configured jsfiles
+            elif event.pathname in self._jswatchlist:
+                if event.maskname in self._listen_events:
+                    print('{} changed!'.format(event.pathname))
+                    self.build_js()
 
     def build_js(self):
         """minify everything, then concat everything
@@ -108,6 +115,7 @@ class Kyk(object):
 
                     f.write(out)
         print('finished')
+        self._update_timestamp()
 
     def concat_js(self, destfile):
         print('building {}...'.format(destfile))
@@ -152,6 +160,15 @@ class Kyk(object):
 
         return out
 
+    def _update_timestamp(self):
+        try: 
+            with open(self._timestamp_file, 'w') as f:
+                f.write(int(time.time()))
+            print('timesamp updated')
+        except Exception as e:
+            print(Fore.RED + 'Error updating timestamp file: {}'.format(e))
+            print(Style.RESET_ALL)
+
     def build_sass(self):
         try:
             print('building sass...')
@@ -159,10 +176,17 @@ class Kyk(object):
                 with open(minfile, 'w', encoding='utf-8') as f:
                     for sassfile in self._css[minfile]:
                         if sassfile.endswith('.scss'):
-                            f.write(compress(sass.compile(filename=sassfile)))
+                            sc = sass.compile(filename=sassfile)
+                            if not self._debug:
+                                sc = compress(sc)
+                            f.write(sc)
                         else:
-                            f.write(compress(open(sassfile, 'r', encoding='utf-8').read()))
+                            sc = open(sassfile, 'r', encoding='utf-8').read()
+                            if not self._debug:
+                                sc = compress(sc)
+                            f.write(sc)
             print('finished')
+            self._update_timestamp()
         except sass.CompileError as e:
             print(Fore.RED + 'SASS Error: {}'.format(e))
             print(Style.RESET_ALL)

@@ -9,7 +9,10 @@ EXAMPLE ="""
 # kyk config file
 #----------------------
 # cfg version
-version: 1
+version: 1.0
+
+# optional, if changes are detected we change the unix timestamp in this file
+timestamp_file: ./timestamp
 
 # possible events on which css or js is build, takes everything pyinotify takes
 events:
