@@ -73,11 +73,11 @@ class Kyk(object):
             elif minfile.endswith('.css'):
                 self._css[minfile] = self._cfg[minfile]
 
+        print('Kyk version: {}'.format(VERSION))
+        print('config version: {}'.format(self._version))
         print('listening on:')
         print(self._listen_events)
-        print('config version: {}'.format(self._version))
-        print('Kyk version: {}'.format(VERSION))
-
+        
     def watch_forever(self):
         # first run, build everything
         self.build_js()
