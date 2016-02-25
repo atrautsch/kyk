@@ -44,6 +44,7 @@ class Kyk(object):
         self._css = {}
         self._jswatchlist = []
         self._listen_events = []
+        self._timestamp_file = None
 
         init()
         self._load_config()
@@ -163,9 +164,10 @@ class Kyk(object):
 
     def _update_timestamp(self):
         try: 
-            with open(self._timestamp_file, 'w') as f:
-                f.write(int(time.time()))
-            print('timesamp updated')
+            if self._timestamp_file:
+                with open(self._timestamp_file, 'w') as f:
+                    f.write(int(time.time()))
+                print('timesamp updated')
         except Exception as e:
             print(Fore.RED + 'Error updating timestamp file: {}'.format(e))
             print(Style.RESET_ALL)
