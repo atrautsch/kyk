@@ -3,13 +3,14 @@
 import sys
 
 from setuptools import setup, find_packages
+from kyk.kyk import VERSION
 
 if not sys.version_info[0] == 3:
     print('only python3 supported!')
     sys.exit(1)
 
 setup(name='kyk',
-      version='1.1',
+      version=VERSION,
       description='sass, css, js minifier watchscript',
       install_requires = ['csscompressor', 'colorama', 'jsmin', 'libsass', 'pyinotify', 'pyaml'],
       author='a-t-x',
