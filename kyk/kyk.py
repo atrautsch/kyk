@@ -52,7 +52,8 @@ class Kyk(object):
     def _load_config(self):
         self._version = self._cfg['version']
         self._listen_events = self._cfg['events']
-        self._timestamp_file = self._cfg['timestamp_file']
+        if 'timestamp_file' in self._cfg.keys():
+            self._timestamp_file = self._cfg['timestamp_file']
 
         for minfile in self._cfg.keys():
             if minfile.endswith('.js'):
