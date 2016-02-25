@@ -8,6 +8,12 @@ It uses pyinotify for detecting changes and libsass for compiling sass files.
 
 A example config file can be printed with kyk --yaml.
 
+installation
+------------
+```bash
+pip install git+https://gitlab.drecks-provider.de/werkzeuge/kyk.git
+```
+
 quickstart
 ----------
 ```bash
