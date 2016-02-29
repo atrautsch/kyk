@@ -9,7 +9,7 @@ if not sys.version_info[0] == 3:
     sys.exit(1)
 
 setup(name='kyk',
-      version=1.2,
+      version=1.3,
       description='sass, css, js minifier watchscript',
       install_requires = ['csscompressor', 'colorama', 'jsmin', 'libsass', 'pyinotify', 'pyaml'],
       author='a-t-x',

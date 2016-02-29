@@ -11,7 +11,7 @@ from colorama import init, Fore, Style
 from jsmin import jsmin
 from csscompressor import compress
 
-VERSION = 1.2
+VERSION = 1.3
 
 class Kyk(object):
     """Kyk
@@ -176,13 +176,18 @@ class Kyk(object):
         try:
             print('building sass...')
             for minfile in self._css.keys():
-                with open(minfile, 'w', encoding='utf-8') as f:
+
+                # only scss source map file
+                mapfile = minfile.replace('.css', '.css.map')
+                with open(minfile, 'w', encoding='utf-8') as f, open(mapfile, 'w', encoding='utf-8') as smf:
                     for sassfile in self._css[minfile]:
                         if sassfile.endswith('.scss'):
-                            sc = sass.compile(filename=sassfile)
-                            if not self._debug:
-                                sc = compress(sc)
+                            os = 'compressed'
+                            if self._debug:
+                                os = 'expanded'
+                            sc, sm = sass.compile(filename=sassfile, source_comments=True, source_map_filename=mapfile, output_style=os)
                             f.write(sc)
+                            smf.write(sm)
                         else:
                             sc = open(sassfile, 'r', encoding='utf-8').read()
                             if not self._debug:

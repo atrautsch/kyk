@@ -3,13 +3,16 @@
 import argparse
 import sys
 
-from kyk.kyk import Kyk
+try:
+    from kyk.kyk import Kyk
+except ImportError:
+    from kyk import Kyk
 
 EXAMPLE ="""
 # kyk config file
 #----------------------
 # cfg version
-version: 1.0
+version: 1.3
 
 # optional, if changes are detected we change the unix timestamp in this file
 timestamp_file: ./timestamp
