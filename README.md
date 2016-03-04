@@ -29,3 +29,18 @@ vi kyk.yaml
 # run kyk
 kyk
 ```
+
+Errors
+------
+
+If something along these lines happens:
+[2016-02-29 11:17:47,178 pyinotify ERROR] add_watch: cannot watch ./images WD=-1, Errno=No space left on device (ENOSPC)
+
+It is most probably a problem with a limit.
+```bash
+# check max_user_watches
+sysctl -n fs.inotify.max_user_watches
+
+# set a higher number e.g. 16384
+sudo sysctl -n -w fs.inotify.max_user_watches=16384
+```

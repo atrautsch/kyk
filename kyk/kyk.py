@@ -186,6 +186,8 @@ class Kyk(object):
                             if self._debug:
                                 os = 'expanded'
                             sc, sm = sass.compile(filename=sassfile, source_comments=True, source_map_filename=mapfile, output_style=os)
+                            if not self._debug:
+                                sc = compress(sc)
                             f.write(sc)
                             smf.write(sm)
                         else:
