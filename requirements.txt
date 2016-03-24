@@ -1,7 +1,7 @@
 colorama==0.3.5
 csscompressor==0.9.4
 jsmin==2.1.6
-libsass==0.9.3
+libsass==0.10.1
 pyaml==15.8.2
 pyinotify==0.9.6
 PyYAML==3.11

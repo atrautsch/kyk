@@ -179,17 +179,19 @@ class Kyk(object):
 
                 # only scss source map file
                 mapfile = minfile.replace('.css', '.css.map')
-                with open(minfile, 'w', encoding='utf-8') as f, open(mapfile, 'w', encoding='utf-8') as smf:
+                smapfile = minfile.replace('.css', '.smap.css')  # this holds the css and the source comments
+                with open(minfile, 'w', encoding='utf-8') as f, open(mapfile, 'w', encoding='utf-8') as smf, open(smapfile, 'w', encoding='utf-8') as sma:
                     for sassfile in self._css[minfile]:
                         if sassfile.endswith('.scss'):
                             os = 'compressed'
                             if self._debug:
                                 os = 'expanded'
                             sc, sm = sass.compile(filename=sassfile, source_comments=True, source_map_filename=mapfile, output_style=os)
-                            if not self._debug:
-                                sc = compress(sc)
-                            f.write(sc)
+                            sc_clean = sass.compile(filenmae=sassfile, source_comments=False, output_style=os)  # without source comments
+
+                            f.write(sc_clean)
                             smf.write(sm)
+                            sma.write(sc)
                         else:
                             sc = open(sassfile, 'r', encoding='utf-8').read()
                             if not self._debug:
