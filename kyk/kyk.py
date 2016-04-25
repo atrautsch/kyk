@@ -11,7 +11,7 @@ from colorama import init, Fore, Style
 from jsmin import jsmin
 from csscompressor import compress
 
-VERSION = '1.4.0'
+VERSION = '1.4.1'
 
 class Kyk(object):
     """Kyk
@@ -187,7 +187,7 @@ class Kyk(object):
                             if self._debug:
                                 os = 'expanded'
                             sc, sm = sass.compile(filename=sassfile, source_comments=True, source_map_filename=mapfile, output_style=os)
-                            sc_clean = sass.compile(filenmae=sassfile, source_comments=False, output_style=os)  # without source comments
+                            sc_clean = sass.compile(filename=sassfile, source_comments=False, output_style=os)  # without source comments
 
                             f.write(sc_clean)
                             smf.write(sm)
