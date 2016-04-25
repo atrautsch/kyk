@@ -12,6 +12,9 @@ installation
 ------------
 ```bash
 pip install git+https://gitlab.drecks-provider.de/werkzeuge/kyk.git
+
+# optional ssh
+# pip install git+ssh://username@gitlab.drecks-provider.de/werkzeuge/kyk.git
 ```
 
 quickstart
