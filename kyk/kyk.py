@@ -11,7 +11,7 @@ from colorama import init, Fore, Style
 from jsmin import jsmin
 from csscompressor import compress
 
-VERSION = 1.4
+VERSION = '1.4.0'
 
 class Kyk(object):
     """Kyk

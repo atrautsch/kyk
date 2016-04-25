@@ -9,7 +9,7 @@ if not sys.version_info[0] == 3:
     sys.exit(1)
 
 setup(name='kyk',
-      version=1.4,
+      version='1.4.0',
       description='sass, css, js minifier watchscript',
       install_requires = ['csscompressor', 'colorama', 'jsmin', 'libsass', 'pyinotify', 'pyaml'],
       author='a-t-x',
@@ -19,9 +19,9 @@ setup(name='kyk',
       packages=find_packages(),
       #py_modules=['kyk.py'],
       scripts=['kyk/kyk'],
+      keywords='minifier watchscript',
       classifiers = [
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Intended Audience :: Developers",
