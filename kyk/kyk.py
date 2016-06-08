@@ -11,7 +11,7 @@ from colorama import init, Fore, Style
 from jsmin import jsmin
 from csscompressor import compress
 
-VERSION = '1.4.1'
+VERSION = '1.4.2'
 
 class Kyk(object):
     """Kyk
@@ -111,9 +111,9 @@ class Kyk(object):
             with open(minfile, 'w', encoding='utf-8') as f:
                 for jsfile in self._js[minfile]:
                     if jsfile['minify'] and not self._debug:
-                        self.minify_js(jsfile['file'])
+                        self.minify_js(jsfile['file'], jsfile['minify'])
 
-                    out = self._load_js(jsfile['file'])
+                    out = self._load_js(jsfile['file'], jsfile['minify'])
 
                     f.write(out)
         print('finished')

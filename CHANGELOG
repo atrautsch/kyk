@@ -1,3 +1,6 @@
+1.4.2
+- minify now only loads minified version if min: is explicitly wanted
+
 1.4.1
 - sass now wires source maps extra
 - inotify checks if event has a pathname attribute
