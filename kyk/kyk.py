@@ -111,7 +111,7 @@ class Kyk(object):
             with open(minfile, 'w', encoding='utf-8') as f:
                 for jsfile in self._js[minfile]:
                     if jsfile['minify'] and not self._debug:
-                        self.minify_js(jsfile['file'], load_minified=jsfile['minify'])
+                        self.minify_js(jsfile['file'])
 
                     out = self._load_js(jsfile['file'], load_minified=jsfile['minify'])
 
