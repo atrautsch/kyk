@@ -11,7 +11,7 @@ from colorama import init, Fore, Style
 from jsmin import jsmin
 from csscompressor import compress
 
-VERSION = '1.4.2'
+VERSION = '1.4.3'
 
 class Kyk(object):
     """Kyk
@@ -115,7 +115,8 @@ class Kyk(object):
 
                     out = self._load_js(jsfile['file'], load_minified=jsfile['minify'])
 
-                    f.write(out)
+                    f.write(out + "\n")
+
         print('finished')
         self._update_timestamp()
 
