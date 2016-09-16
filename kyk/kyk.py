@@ -108,7 +108,7 @@ class Kyk(object):
                     print('{} changed!'.format(event.pathname))
                     self.build_js()
 
-            elif event.pathname.endswith('kyk.yml'):
+            elif event.pathname.endswith('kyk.yaml'):
                 print('kyk config changed, reloading')
                 self._load_config()
                 self.build_js()
