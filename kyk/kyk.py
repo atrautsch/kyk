@@ -90,9 +90,16 @@ class Kyk(object):
 
         # now only changed files
         wm = pyinotify.WatchManager()
-        notifier = pyinotify.Notifier(wm, default_proc_fun=self.handler)
+        self.notifier = pyinotify.Notifier(wm, default_proc_fun=self.handler)
         wm.add_watch(self._folder, pyinotify.ALL_EVENTS, rec=True, auto_add=True)
-        notifier.loop()
+        self.notifier.loop()
+
+    def reload(self):
+        self.notifier.stop()
+        self._load_config()
+        self.build_js()
+        self.build_sass()
+        self.notifier.loop()
 
     def handler(self, event):
         # catch every scss file change, we can do this here because we are limited by the watchpath
@@ -110,10 +117,7 @@ class Kyk(object):
 
             elif event.pathname.endswith('kyk.yaml'):
                 print('kyk config changed, reloading')
-                self._load_config()
-                self.build_js()
-                self.build_sass()
-
+                self.reload()
 
     def build_js(self):
         """minify everything, then concat everything
