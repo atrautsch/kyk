@@ -1,5 +1,6 @@
 1.4.4
 - add --oneshot option which only builds
+- add rebuild on changed kyk.yml
 
 1.4.3
 - add line break on concatting js files

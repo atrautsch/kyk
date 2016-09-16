@@ -30,7 +30,11 @@ class Kyk(object):
     def __init__(self, folder, debug):
         self._folder = folder
         self._debug = debug
+        init()
+        self._load_config()
 
+
+    def _load_config(self):
         cfgfile = os.path.normpath(os.path.join(self._folder, 'kyk.yaml'))
         if not os.path.isfile(cfgfile):
             raise Exception('no config file "{}" found!'.format(cfgfile))
@@ -46,11 +50,6 @@ class Kyk(object):
         self._listen_events = []
         self._timestamp_file = None
 
-        init()
-        self._load_config()
-
-
-    def _load_config(self):
         self._version = self._cfg['version']
         self._listen_events = self._cfg['events']
         if 'timestamp_file' in self._cfg.keys():
@@ -108,6 +107,13 @@ class Kyk(object):
                 if event.maskname in self._listen_events:
                     print('{} changed!'.format(event.pathname))
                     self.build_js()
+
+            elif event.pathname.endswith('kyk.yml'):
+                print('kyk config changed, reloading')
+                self._load_config()
+                self.build_js()
+                self.build_sass()
+
 
     def build_js(self):
         """minify everything, then concat everything
