@@ -75,10 +75,16 @@ class Kyk(object):
 
         print('Kyk version: {}'.format(VERSION))
         print('config version: {}'.format(self._version))
+    
+    def oneshot(self):
+        print('oneshot')
+        self.build_js()
+        self.build_sass()
+
+    def watch_forever(self):
         print('listening on:')
         print(self._listen_events)
-        
-    def watch_forever(self):
+
         # first run, build everything
         self.build_js()
         self.build_sass()

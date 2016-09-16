@@ -12,7 +12,7 @@ EXAMPLE ="""
 # kyk config file
 #----------------------
 # cfg version
-version: 1.4.3
+version: 1.4.4
 
 # optional, if changes are detected we change the unix timestamp in this file
 timestamp_file: ./timestamp
@@ -39,6 +39,7 @@ def main():
     a = argparse.ArgumentParser(description="kyk watchscript, detect changes in sass and configured js files with pyinotify")
     a.add_argument('--yaml', action='store_true', help='print example yaml config for kyk')
     a.add_argument('--debug', action='store_true', help='no minification, only concatenation of files')
+    a.add_argument('--oneshot', action='store_true', help='No watchscript just generate everything once, then exti')
     args = vars(a.parse_args())
 
     if args['yaml']:
@@ -46,7 +47,11 @@ def main():
         sys.exit(0)
 
     k = Kyk('.', args['debug'])
-    k.watch_forever()
+    
+    if args['oneshot']:
+        k.oneshot()
+    else:
+        k.watch_forever()
 
 if __name__ == '__main__':
     main()

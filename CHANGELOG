@@ -1,3 +1,6 @@
+1.4.4
+- add --oneshot option which only builds
+
 1.4.3
 - add line break on concatting js files
 
