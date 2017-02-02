@@ -1,9 +1,14 @@
+1.4.5
+- add debug option to kyk.yml #4
+- do not die if .js file can not be found #5
+- do not die immediately if kyk.yml is gone #6
+
 1.4.4
 - add --oneshot option which only builds
 - add rebuild on changed kyk.yml
 
 1.4.3
-- add line break on concatting js files
+- add line break on concatenating js files
 
 1.4.2
 - minify now only loads minified version if min: is explicitly wanted

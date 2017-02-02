@@ -8,11 +8,15 @@ try:
 except ImportError:
     from kyk import Kyk
 
-EXAMPLE ="""
+
+EXAMPLE = """
 # kyk config file
 #----------------------
 # cfg version
-version: 1.4.4
+version: 1.4.5
+
+# optional, if True no minification is performed
+debug: False
 
 # optional, if changes are detected we change the unix timestamp in this file
 timestamp_file: ./timestamp
@@ -35,6 +39,7 @@ events:
 - "test/style.dev.css"
 """
 
+
 def main():
     a = argparse.ArgumentParser(description="kyk watchscript, detect changes in sass and configured js files with pyinotify")
     a.add_argument('--yaml', action='store_true', help='print example yaml config for kyk')
@@ -47,11 +52,12 @@ def main():
         sys.exit(0)
 
     k = Kyk('.', args['debug'])
-    
+
     if args['oneshot']:
         k.oneshot()
     else:
         k.watch_forever()
+
 
 if __name__ == '__main__':
     main()

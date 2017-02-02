@@ -11,7 +11,8 @@ from colorama import init, Fore, Style
 from jsmin import jsmin
 from csscompressor import compress
 
-VERSION = '1.4.4'
+VERSION = '1.4.5'
+
 
 class Kyk(object):
     """Kyk
@@ -26,16 +27,17 @@ class Kyk(object):
 
     Build partial js not yet implemented completely
     """
-    
+
     def __init__(self, folder, debug):
         self._folder = folder
         self._debug = debug
         init()
         self._load_config()
 
-
-    def _load_config(self):
+    def _load_config(self, reloading=False):
         cfgfile = os.path.normpath(os.path.join(self._folder, 'kyk.yaml'))
+        if not os.path.isfile(cfgfile) and reloading:
+            time.sleep(1)  # wait for it to appear (ftp program maybe?)
         if not os.path.isfile(cfgfile):
             raise Exception('no config file "{}" found!'.format(cfgfile))
 
@@ -50,6 +52,7 @@ class Kyk(object):
         self._listen_events = []
         self._timestamp_file = None
 
+        self._debug = 'debug' in self._cfg.keys() and self._cfg['debug'] == 1
         self._version = self._cfg['version']
         self._listen_events = self._cfg['events']
         if 'timestamp_file' in self._cfg.keys():
@@ -59,7 +62,7 @@ class Kyk(object):
             if minfile.endswith('.js'):
                 jsfile = self._cfg[minfile]
                 minify = False
-                
+
                 for jsfile in self._cfg[minfile]:
                     if jsfile.startswith('min:'):
                         minify = True
@@ -74,7 +77,7 @@ class Kyk(object):
 
         print('Kyk version: {}'.format(VERSION))
         print('config version: {}'.format(self._version))
-    
+
     def oneshot(self):
         print('oneshot')
         self.build_js()
@@ -96,7 +99,7 @@ class Kyk(object):
 
     def reload(self):
         self.notifier.stop()
-        self._load_config()
+        self._load_config(True)
         self.watch_forever()
 
     def handler(self, event):
@@ -140,7 +143,7 @@ class Kyk(object):
             for jsfile in self._js[destfile]:
                 if self._debug:
                     f.write('{}\n'.format(self._load_js(jsfile['file'])))
-                f.write(self._load_js(jsfile['file'])+';')
+                f.write(self._load_js(jsfile['file']) + ';')
         print('finished')
 
     def minify_js(self, jsfile=None):
@@ -153,7 +156,7 @@ class Kyk(object):
 
     def build_partial_js(self, changed):
         print('building partial js...')
-        
+
         for minfile in self._js:
             for jsfile in self._js[minfile]:
                 if changed == jsfile['file']:
@@ -172,13 +175,15 @@ class Kyk(object):
             print(Fore.RED + 'File {} not found!'.format(jsfile))
             print(Style.RESET_ALL)
 
-        with open(jsfile, 'r', encoding='utf-8') as f:
-            out = f.read()
+            return ''
+        else:
+            with open(jsfile, 'r', encoding='utf-8') as f:
+                out = f.read()
 
-        return out
+            return out
 
     def _update_timestamp(self):
-        try: 
+        try:
             if self._timestamp_file:
                 with open(self._timestamp_file, 'w') as f:
                     f.write('{}'.format(int(time.time())))
