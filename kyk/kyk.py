@@ -2,6 +2,8 @@
 
 import os
 import time
+import shutil
+import signal
 
 import yaml
 import sass
@@ -11,7 +13,7 @@ from colorama import init, Fore, Style
 from jsmin import jsmin
 from csscompressor import compress
 
-VERSION = '1.4.5'
+VERSION = '1.4.7'
 
 
 class Kyk(object):
@@ -33,6 +35,11 @@ class Kyk(object):
         self._debug = debug
         init()
         self._load_config()
+        signal.signal(signal.SIGINT, self.teardown)
+
+    def teardown(self):
+        if type(self.notifier) == pyinotify.ThreadedNotifier:
+            self.notifier.stop()
 
     def _load_config(self, reloading=False):
         cfgfile = os.path.normpath(os.path.join(self._folder, 'kyk.yaml'))
@@ -52,7 +59,13 @@ class Kyk(object):
         self._listen_events = []
         self._timestamp_file = None
 
-        self._debug = 'debug' in self._cfg.keys() and self._cfg['debug'] == 1
+        if 'watch_path' in self._cfg.keys():
+            self._folder = self._cfg['watch_path']
+
+        # no overwriting of command line debug, if config file does not hold debug: True we do not want to disable --debug
+        if not self._debug:
+            self._debug = 'debug' in self._cfg.keys() and self._cfg['debug']
+
         self._version = self._cfg['version']
         self._listen_events = self._cfg['events']
         if 'timestamp_file' in self._cfg.keys():
@@ -93,9 +106,11 @@ class Kyk(object):
 
         # now only changed files
         self.wm = pyinotify.WatchManager()
-        self.notifier = pyinotify.Notifier(self.wm, default_proc_fun=self.handler)
+        self.notifier = pyinotify.ThreadedNotifier(self.wm, default_proc_fun=self.handler)
         self.wm.add_watch(self._folder, pyinotify.ALL_EVENTS, rec=True, auto_add=True)
-        self.notifier.loop()
+        # self.notifier.loop()
+        self.notifier.start()
+        signal.pause()
 
     def reload(self):
         self.notifier.stop()
@@ -193,32 +208,43 @@ class Kyk(object):
             print(Style.RESET_ALL)
 
     def build_sass(self):
-        try:
             print('building sass...')
             for minfile in self._css.keys():
+                try:
+                    # tmp minfile name
+                    tmp_minfile = 'kyk_{}'.format(minfile)
+                    # only scss source map file
+                    mapfile = tmp_minfile.replace('.css', '.css.map')
+                    smapfile = tmp_minfile.replace('.css', '.smap.css')  # this holds the css and the source comments
+                    with open(tmp_minfile, 'w', encoding='utf-8') as f, open(mapfile, 'w', encoding='utf-8') as smf, open(smapfile, 'w', encoding='utf-8') as sma:
+                        for sassfile in self._css[minfile]:
+                            if sassfile.endswith('.scss'):
+                                os = 'compressed'
+                                if self._debug:
+                                    os = 'expanded'
+                                sc, sm = sass.compile(filename=sassfile, source_comments=True, source_map_filename=mapfile, output_style=os)
+                                sc_clean = sass.compile(filename=sassfile, source_comments=False, output_style=os)  # without source comments
 
-                # only scss source map file
-                mapfile = minfile.replace('.css', '.css.map')
-                smapfile = minfile.replace('.css', '.smap.css')  # this holds the css and the source comments
-                with open(minfile, 'w', encoding='utf-8') as f, open(mapfile, 'w', encoding='utf-8') as smf, open(smapfile, 'w', encoding='utf-8') as sma:
-                    for sassfile in self._css[minfile]:
-                        if sassfile.endswith('.scss'):
-                            os = 'compressed'
-                            if self._debug:
-                                os = 'expanded'
-                            sc, sm = sass.compile(filename=sassfile, source_comments=True, source_map_filename=mapfile, output_style=os)
-                            sc_clean = sass.compile(filename=sassfile, source_comments=False, output_style=os)  # without source comments
+                                f.write(sc_clean)
+                                smf.write(sm)
+                                sma.write(sc)
+                            else:
+                                sc = open(sassfile, 'r', encoding='utf-8').read()
+                                if not self._debug:
+                                    sc = compress(sc)
+                                f.write(sc)
 
-                            f.write(sc_clean)
-                            smf.write(sm)
-                            sma.write(sc)
-                        else:
-                            sc = open(sassfile, 'r', encoding='utf-8').read()
-                            if not self._debug:
-                                sc = compress(sc)
-                            f.write(sc)
+                    shutil.copy(tmp_minfile, minfile)
+                    shutil.copy(mapfile, minfile.replace('.css', '.css.map'))
+                    shutil.copy(smapfile, minfile.replace('.css', '.smap.css'))
+                except sass.CompileError as e:
+                    print(Fore.RED + 'SASS Error: {}'.format(e))
+                    print(Style.RESET_ALL)
+
+                    # in debug mode we break things on purpose here
+                    if self._debug:
+                        shutil.copy(tmp_minfile, minfile)
+                        shutil.copy(mapfile, minfile.replace('.css', '.css.map'))
+                        shutil.copy(smapfile, minfile.replace('.css', '.smap.css'))
             print('finished')
             self._update_timestamp()
-        except sass.CompileError as e:
-            print(Fore.RED + 'SASS Error: {}'.format(e))
-            print(Style.RESET_ALL)

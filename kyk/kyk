@@ -13,13 +13,16 @@ EXAMPLE = """
 # kyk config file
 #----------------------
 # cfg version
-version: 1.4.5
+version: 1.4.7
 
 # optional, if True no minification is performed
 debug: False
 
 # optional, if changes are detected we change the unix timestamp in this file
 timestamp_file: ./timestamp
+
+# optional, define path that is watched for changes, defaults to current working dir
+# watch_path: .
 
 # possible events on which css or js is build, takes everything pyinotify takes
 events:

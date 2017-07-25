@@ -1,3 +1,10 @@
+1.4.7
+- add config option to specify the path that is being watched (defaults to kyk working dir)
+- if running in watch mode, now a rebuild of everything is triggered on enter
+
+1.4.6
+- do not kill previous compiled SASS if SASS compile fails and if debug is False
+
 1.4.5
 - add debug option to kyk.yml #4
 - do not die if .js file can not be found #5
