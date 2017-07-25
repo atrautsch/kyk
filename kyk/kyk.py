@@ -39,6 +39,7 @@ class Kyk(object):
 
     def teardown(self, signal, frame):
         if type(self.notifier) == pyinotify.ThreadedNotifier:
+            print('stopping watching')
             self.notifier.stop()
 
     def _load_config(self, reloading=False):
