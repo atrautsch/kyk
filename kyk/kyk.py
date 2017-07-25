@@ -166,7 +166,7 @@ class Kyk(object):
         """
         out = jsmin(self._load_js(jsfile, load_minified=False))
 
-        with open('{}_minified'.format(jsfile), 'w', encoding='utf-8') as f:
+        with open('.{}_minified'.format(jsfile), 'w', encoding='utf-8') as f:
             f.write(out)
 
     def build_partial_js(self, changed):
@@ -183,8 +183,8 @@ class Kyk(object):
     def _load_js(self, jsfile, load_minified=True):
         """Load js from file, load _minifed if exists and we want to have it (we do not want it if we minify anew)
         """
-        if load_minified and os.path.isfile('{}_minified'.format(jsfile)):
-            jsfile = '{}_minified'.format(jsfile)
+        if load_minified and os.path.isfile('.{}_minified'.format(jsfile)):
+            jsfile = '.{}_minified'.format(jsfile)
 
         if not os.path.isfile(jsfile):
             print(Fore.RED + 'File {} not found!'.format(jsfile))
@@ -211,19 +211,22 @@ class Kyk(object):
             print('building sass...')
             for minfile in self._css.keys():
                 try:
-                    # tmp minfile name
-                    tmp_minfile = 'kyk_{}'.format(minfile)
+                    # tmp minfile name for writing
+                    minfile_name = os.path.basename(minfile)
+                    tmp_minfile_name = '.kyk_{}'.format(minfile_name)
+
+                    tmp_minfile = minfile.replace(minfile_name, tmp_minfile_name)
                     # only scss source map file
                     mapfile = tmp_minfile.replace('.css', '.css.map')
                     smapfile = tmp_minfile.replace('.css', '.smap.css')  # this holds the css and the source comments
                     with open(tmp_minfile, 'w', encoding='utf-8') as f, open(mapfile, 'w', encoding='utf-8') as smf, open(smapfile, 'w', encoding='utf-8') as sma:
                         for sassfile in self._css[minfile]:
                             if sassfile.endswith('.scss'):
-                                os = 'compressed'
+                                ost = 'compressed'
                                 if self._debug:
-                                    os = 'expanded'
-                                sc, sm = sass.compile(filename=sassfile, source_comments=True, source_map_filename=mapfile, output_style=os)
-                                sc_clean = sass.compile(filename=sassfile, source_comments=False, output_style=os)  # without source comments
+                                    ost = 'expanded'
+                                sc, sm = sass.compile(filename=sassfile, source_comments=True, source_map_filename=mapfile, output_style=ost)
+                                sc_clean = sass.compile(filename=sassfile, source_comments=False, output_style=ost)  # without source comments
 
                                 f.write(sc_clean)
                                 smf.write(sm)
