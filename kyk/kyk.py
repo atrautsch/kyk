@@ -166,7 +166,7 @@ class Kyk(object):
         """
         out = jsmin(self._load_js(jsfile, load_minified=False))
 
-        with open('.{}_minified'.format(jsfile), 'w', encoding='utf-8') as f:
+        with open('{}_minified'.format(jsfile), 'w', encoding='utf-8') as f:
             f.write(out)
 
     def build_partial_js(self, changed):
@@ -183,8 +183,8 @@ class Kyk(object):
     def _load_js(self, jsfile, load_minified=True):
         """Load js from file, load _minifed if exists and we want to have it (we do not want it if we minify anew)
         """
-        if load_minified and os.path.isfile('.{}_minified'.format(jsfile)):
-            jsfile = '.{}_minified'.format(jsfile)
+        if load_minified and os.path.isfile('{}_minified'.format(jsfile)):
+            jsfile = '{}_minified'.format(jsfile)
 
         if not os.path.isfile(jsfile):
             print(Fore.RED + 'File {} not found!'.format(jsfile))
@@ -213,7 +213,7 @@ class Kyk(object):
                 try:
                     # tmp minfile name for writing
                     minfile_name = os.path.basename(minfile)
-                    tmp_minfile_name = '.kyk_{}'.format(minfile_name)
+                    tmp_minfile_name = 'kyk_{}'.format(minfile_name)
 
                     tmp_minfile = minfile.replace(minfile_name, tmp_minfile_name)
                     # only scss source map file
