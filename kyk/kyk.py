@@ -37,7 +37,7 @@ class Kyk(object):
         self._load_config()
         signal.signal(signal.SIGINT, self.teardown)
 
-    def teardown(self):
+    def teardown(self, signal, frame):
         if type(self.notifier) == pyinotify.ThreadedNotifier:
             self.notifier.stop()
 
