@@ -11,10 +11,7 @@ A example config file can be printed with kyk --yaml.
 installation
 ------------
 ```bash
-pip install git+https://gitlab.drecks-provider.de/werkzeuge/kyk.git
-
-# optional ssh
-# pip install git+ssh://git@gitlab.drecks-provider.de/werkzeuge/kyk.git
+pip install kyk
 ```
 
 quickstart
@@ -32,6 +29,17 @@ vi kyk.yaml
 # run kyk
 kyk
 ```
+
+Options
+-------
+```bash
+# debug, only concatenate no minification
+kyk --debug
+
+# oneshot, minify and concatenate but not watch continuously
+kyk --oneshot
+```
+
 
 Errors
 ------
